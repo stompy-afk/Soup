@@ -1,0 +1,4 @@
+name: Soup
+version: '1.0-SNAPSHOT'
+main: lol.stompy.soup.Soup
+api-version: '1.21'
