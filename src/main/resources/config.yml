@@ -1,1 +1,2 @@
 kits-outside-spawn: true
+profile-saving: CONFIG #CONFIG/MONGO

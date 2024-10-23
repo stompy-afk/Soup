@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.bson.Document;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.UUID;
@@ -26,6 +28,13 @@ public class Profile {
 
     public Profile(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public Profile(ConfigurationSection configurationSection) {
+        this.uuid = UUID.fromString(configurationSection.getName());
+        this.kills = configurationSection.getInt("kills");
+        this.coins = configurationSection.getInt("coins");
+        this.deaths = configurationSection.getInt("deaths");
     }
 
     /**

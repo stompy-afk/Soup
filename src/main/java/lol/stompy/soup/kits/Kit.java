@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.bson.Document;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -52,42 +53,19 @@ public class Kit {
     }
 
     /**
-     * creates a kit from a document
-     *
-     * @param document document to create kit from
-     */
-
-    @SneakyThrows
-    public Kit(Document document) {
-        this.uuid = UUID.fromString(document.getString("_id"));
-        this.name = document.getString("name");
-        this.permission = document.getString("permission");
-
-        final String contents = document.getString("contents");
-        final String armorContents = document.getString("armorContents");
-
-        if (!contents.equalsIgnoreCase("null"))
-            this.contents = Serializer.itemStackArrayFromBase64(contents);
-
-        if (!armorContents.equalsIgnoreCase("null"))
-            this.armorContents = Serializer.itemStackArrayFromBase64(armorContents);
-    }
-
-    /**
      * creates a kit from the config
      *
-     * @param fileConfiguration file to get data from
-     * @param path path to reach
+     * @param configurationSection configuration section to get data from
      */
 
     @SneakyThrows
-    public Kit(FileConfiguration fileConfiguration, String path) {
-        this.uuid = UUID.fromString(Objects.requireNonNull(fileConfiguration.getString(path + "id")));
-        this.name = Objects.requireNonNull(fileConfiguration.getString(path + "name"));
-        this.permission = fileConfiguration.getString(path + "permission");
+    public Kit(ConfigurationSection configurationSection) {
+        this.uuid = UUID.fromString(Objects.requireNonNull(configurationSection.getString( "id")));
+        this.name = Objects.requireNonNull(configurationSection.getName());
+        this.permission = configurationSection.getString("permission");
 
-        final String contents = fileConfiguration.getString(path + "contents");
-        final String armorContents = fileConfiguration.getString(path + "armorContents");
+        final String contents = configurationSection.getString("contents");
+        final String armorContents = configurationSection.getString("armorContents");
 
         if (!Objects.requireNonNull(contents).equalsIgnoreCase("null"))
             this.contents = Serializer.itemStackArrayFromBase64(contents);
@@ -128,27 +106,13 @@ public class Kit {
         final FileConfiguration fileConfiguration = file.getConfig();
         final String uuidString = uuid.toString();
 
-        fileConfiguration.set(uuidString + ".name", name);
-        fileConfiguration.set(uuidString + ".permission", permission);
+        fileConfiguration.set("kits." + uuidString + ".name", name);
+        fileConfiguration.set("kits." + uuidString + ".permission", permission);
 
-        fileConfiguration.set(uuidString + ".contents", contents == null ? "null" : Serializer.itemStackArrayToBase64(contents));
-        fileConfiguration.set(uuidString + ".armorContents", armorContents == null ? "null" : Serializer.itemStackArrayToBase64(armorContents));
+        fileConfiguration.set("kits." + uuidString + ".contents", contents == null ? "null" : Serializer.itemStackArrayToBase64(contents));
+        fileConfiguration.set("kits." + uuidString + ".armorContents", armorContents == null ? "null" : Serializer.itemStackArrayToBase64(armorContents));
 
         file.save();
-    }
-
-    /**
-     * puts all the kits info in a document
-     *
-     * @return {@link Document}
-     */
-
-    public Document toBson() {
-        return new Document("_id", uuid.toString())
-                .append("name", name)
-                .append("permission", permission)
-                .append("contents", contents == null ? "null" : Serializer.itemStackArrayToBase64(contents))
-                .append("armorContents", armorContents == null ? "null" : Serializer.itemStackArrayToBase64(armorContents));
     }
 
 }
